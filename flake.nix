@@ -11,13 +11,17 @@
       pkgs = import nixpkgs { inherit system; config = {}; overlays = []; };
     in
     {
-      packages.${system}.default = pkgs.buildEnv {
+      devShells.${system}.default = pkgs.mkShell {
         name = "weather-balloon-environment";
-        paths = with pkgs; [
+        buildInputs = with pkgs; [
           gcc
           gnumake
           python313
+          clang-tools
         ];
+        shellHook = ''
+        export CPATH="${pkgs.glibc.dev}/include:$CPATH"
+        '';
       };
     };
 }

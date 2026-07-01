@@ -1,13 +1,13 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
 #include "./cJSON.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 void getWord(char *dest) {
   srand(time(NULL));
 
-  FILE *file = fopen("./src/wordle-hard/wordle-words.json", "r");
+  FILE *file = fopen("./src/wordle-hard/wordle-answers.json", "r");
   if (!file) {
     printf("Error: could not access words file.");
     return;
@@ -18,7 +18,9 @@ void getWord(char *dest) {
   fseek(file, 0, SEEK_SET);
 
   char *json_str = malloc(len + 1);
-  fread(json_str, 1, len, file);
+  if (fread(json_str, 1, len, file) < len) {
+    printf("Error: reading file failed");
+  }
   json_str[len] = '\0';
   fclose(file);
 
@@ -31,7 +33,8 @@ void getWord(char *dest) {
   }
 
   if (cJSON_IsArray(arr)) {
-    cJSON *word_item = cJSON_GetArrayItem(arr, rand() % cJSON_GetArraySize(arr));
+    cJSON *word_item =
+        cJSON_GetArrayItem(arr, rand() % cJSON_GetArraySize(arr));
 
     if (cJSON_IsString(word_item) && (word_item->valuestring != NULL)) {
       snprintf(dest, 6, "%s", word_item->valuestring);
@@ -45,7 +48,10 @@ bool singleGuess(char word[6]) {
   printf("> ");
 
   char input[6];
-  scanf("%5s", input);
+  int scanned = scanf("%5s", input);
+  if (scanned != 1) {
+    printf("Error: scanf did not find exactly one input");
+  }
 
   bool correct = true;
   printf("\033[1A\033[2K> ");
@@ -74,5 +80,5 @@ int main() {
     }
   }
 
-  prinf("Better luck next time!");
+  printf("Better luck next time! The word was %s.", word);
 }
