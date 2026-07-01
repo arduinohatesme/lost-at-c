@@ -129,10 +129,10 @@ bool singleGuess(char word[6]) {
   } while (!inWordList);
 
   bool correct = true;
-  char *tmpword = malloc(strlen(word) + 1);
-  strncpy(tmpword, word, strlen(word));
   printf("\033[1A\033[2K> ");
   for (int i = 0; i < 5; i++) {
+    char *tmpword = malloc(strlen(word) + 1);
+    strncpy(tmpword, word, strlen(word));
     if (tmpword[i] == input[i]) {
       printf("\x1b[32m%c\x1b[0m", input[i]);
       tmpword[i] = '.';
